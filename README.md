@@ -20,6 +20,8 @@ then run gips and supply wanted speed in km/h as integer value:
 
 If your route is one-way only, you can generate the way back by using the `--reverse` option.
 
+You can generate stopping at the last point by using `--stop MINUTES` option.
+
 Then add the output.gpx to your Xcode project. For more info see http://blackpixel.com/blog/2013/05/simulating-locations-with-xcode.html
 
 ## Generating input GPX
