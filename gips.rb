@@ -7,11 +7,17 @@ require 'clamp'
 require 'clamp'
 
 XCODE_WAYPOINTS_PER_SECOND = 0.5
+SECONDS_IN_MINUTE = 60
 
 Clamp do
   option "--reverse", :flag, "After reaching destination, travel back to start"
+
   option "--speed", "KMH", "Speed in km/h (integer)", required: true do |s|
     Integer(s)
+  end
+
+  option "--stop", "Stops for input time in minutes at last wp", required: false do |stop|
+    Integer(stop)
   end
 
   parameter "SRC.gpx", "Source GPX file", attribute_name: :infile
@@ -68,12 +74,18 @@ Clamp do
 
     File.open(outfile,'w') do |f|
       f.puts "<gpx>"
+      last_wp = ""
       output.each do |o|
-       f.puts "<wpt lat=\"#{o[0]}\" lon=\"#{o[1]}\"></wpt>"
+        last_wp = "<wpt lat=\"#{o[0]}\" lon=\"#{o[1]}\"></wpt>"
+        f.puts "<wpt lat=\"#{o[0]}\" lon=\"#{o[1]}\"></wpt>"
+      end
+      if !stop.zero?
+        puts "Waiting on last point for #{stop} minutes (#{stop * SECONDS_IN_MINUTE} seconds)"
+        (stop * SECONDS_IN_MINUTE).times { f.puts last_wp }
       end
       f.puts "</gpx>"
     end
 
-    puts "Wrote #{output.count} points to #{outfile} to simulate speed of #{speed} km/h."
+    puts "Wrote #{output.count} (ignoring waiting at last point) points to #{outfile} to simulate speed of #{speed} km/h."
   end
 end
