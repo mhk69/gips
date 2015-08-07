@@ -20,6 +20,10 @@ Clamp do
     Integer(stop)
   end
 
+  option "--initial", "Initial time to stop before moving on (from first wp)", required: false do |initial|
+    Integer(initial)
+  end
+
   parameter "SRC.gpx", "Source GPX file", attribute_name: :infile
   parameter "DST.gpx", "Destination GPX file", attribute_name: :outfile
 
@@ -75,6 +79,12 @@ Clamp do
     File.open(outfile,'w') do |f|
       f.puts "<gpx>"
       last_wp = ""
+      if !initial.zero?
+        o = output.first
+        first_wp = "<wpt lat=\"#{o[0]}\" lon=\"#{o[1]}\"></wpt>"
+        (initial * SECONDS_IN_MINUTE).times { f.puts first_wp }
+      end
+
       output.each do |o|
         last_wp = "<wpt lat=\"#{o[0]}\" lon=\"#{o[1]}\"></wpt>"
         f.puts "<wpt lat=\"#{o[0]}\" lon=\"#{o[1]}\"></wpt>"
